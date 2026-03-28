@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrandBee UK Growth Dashboard - Week 6 of 90</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; font-size: 13px; }
+  .dashboard { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 16px; border-bottom: 1px solid #2d3748; }
+  .header-left h1 { font-size: 20px; font-weight: 700; color: #f7fafc; letter-spacing: -0.3px; }
+  .header-left p { font-size: 12px; color: #718096; margin-top: 3px; }
+  .header-right { display: flex; gap: 12px; align-items: center; }
+  .week-badge { background: #2d3748; border: 1px solid #4a5568; border-radius: 6px; padding: 6px 14px; font-size: 12px; color: #a0aec0; }
+  .status-live { background: #1a2e1a; border: 1px solid #276227; border-radius: 6px; padding: 6px 14px; font-size: 12px; color: #68d391; display: flex; align-items: center; gap: 6px; }
+  .dot { width: 7px; height: 7px; background: #68d391; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+
+  /* Filter Bar */
+  .filter-bar { background: #1a202c; border: 1px solid #2d3748; border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .filter-group { display: flex; align-items: center; gap: 10px; }
+  .filter-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #4a5568; white-space: nowrap; }
+  .filter-pills { display: flex; gap: 6px; }
+  .pill { background: #0f1117; border: 1px solid #2d3748; color: #718096; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; cursor: pointer; transition: all .15s; white-space: nowrap; }
+  .pill:hover { border-color: #4a5568; color: #a0aec0; }
+  .pill.active[data-filter="vertical"] { background: #1a2e4a; border-color: #3182ce; color: #63b3ed; }
+  .pill.active[data-filter="source"]   { background: #1a2e2e; border-color: #2c7a7b; color: #4fd1c5; }
+  .filter-divider { width: 1px; height: 24px; background: #2d3748; }
+  .filter-active-indicator { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #f6ad55; background: #1a1505; border: 1px solid #b7791f; border-radius: 4px; padding: 3px 10px; margin-left: auto; }
+  .filter-active-indicator.hidden { display: none; }
+
+  /* Attribution Note */
+  .attr-note { background: #12192a; border: 1px solid #2a3a5a; border-left: 3px solid #3182ce; border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; }
+  .attr-note-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
+  .attr-col { padding: 0 14px; border-left: 1px solid #1e2d4a; }
+  .attr-col:first-child { padding-left: 0; border-left: none; }
+  .attr-col-title { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #3182ce; margin-bottom: 5px; }
+  .attr-col-body { font-size: 11px; color: #718096; line-height: 1.55; }
+  .attr-col-body strong { color: #a0aec0; }
+  .attr-col-body .tag { display: inline-block; background: #1a2e4a; border: 1px solid #2a4a7a; border-radius: 3px; color: #63b3ed; font-size: 9px; font-weight: 700; padding: 1px 5px; margin: 1px 2px 1px 0; }
+  .attr-col-body .tag.amber { background: #1a1505; border-color: #4a3a08; color: #f6ad55; }
+  .attr-col-body .tag.green { background: #0f1a0f; border-color: #276227; color: #68d391; }
+
+  /* Section labels */
+  .section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #4a5568; margin-bottom: 10px; margin-top: 20px; }
+
+  /* KPI Cards */
+  .kpi-row { display: grid; gap: 10px; margin-bottom: 10px; }
+  .kpi-row-4 { grid-template-columns: repeat(4, 1fr); }
+  .kpi-row-5 { grid-template-columns: repeat(5, 1fr); }
+  .kpi-card { background: #1a202c; border: 1px solid #2d3748; border-radius: 8px; padding: 14px 16px; position: relative; overflow: hidden; }
+  .kpi-card.alert { border-color: #c53030; background: #1a0f0f; }
+  .kpi-card.watch { border-color: #b7791f; background: #1a1505; }
+  .kpi-card.good  { border-color: #276227; background: #0f1a0f; }
+  .kpi-card.cross { border-color: #553c9a; background: #1a0f2e; }
+  .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+  .kpi-card.alert::before { background:#fc8181; }
+  .kpi-card.watch::before { background:#f6ad55; }
+  .kpi-card.good::before  { background:#68d391; }
+  .kpi-card.neutral::before { background:#63b3ed; }
+  .kpi-card.cross::before { background:#b794f4; }
+  .kpi-label { font-size: 11px; color: #718096; font-weight: 500; margin-bottom: 6px; }
+  .kpi-value { font-size: 26px; font-weight: 700; color: #f7fafc; line-height: 1; margin-bottom: 6px; }
+  .kpi-value.alert-text { color: #fc8181; }
+  .kpi-value.watch-text { color: #f6ad55; }
+  .kpi-value.good-text  { color: #68d391; }
+  .kpi-value.cross-text { color: #b794f4; }
+  .kpi-sub { display: flex; justify-content: space-between; align-items: center; }
+  .wow { font-size: 11px; font-weight: 600; }
+  .wow.up   { color: #68d391; }
+  .wow.down { color: #fc8181; }
+  .wow.flat { color: #718096; }
+  .vs-baseline { font-size: 10px; color: #718096; }
+  .gate-tag { position: absolute; top: 10px; right: 10px; font-size: 9px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; background: #2d3748; color: #718096; padding: 2px 6px; border-radius: 3px; }
+
+  /* ROI split card */
+  .roi-split { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+  .roi-side + .roi-side { padding-left: 8px; border-left: 1px solid #2d3748; }
+  .roi-side-label { font-size: 9px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; margin-bottom: 3px; }
+  .roi-side-val   { font-size: 19px; font-weight: 700; line-height: 1; margin-bottom: 2px; }
+  .roi-side-note  { font-size: 9px; color: #4a5568; line-height: 1.3; }
+
+  /* Panels */
+  .panel { background: #1a202c; border: 1px solid #2d3748; border-radius: 8px; overflow: hidden; }
+  .panel-header { padding: 12px 16px; border-bottom: 1px solid #2d3748; display: flex; justify-content: space-between; align-items: center; }
+  .panel-title { font-size: 12px; font-weight: 700; color: #e2e8f0; }
+  .panel-sub   { font-size: 10px; color: #4a5568; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #171e2a; }
+  th { padding: 8px 12px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: #4a5568; border-bottom: 1px solid #2d3748; }
+  td { padding: 9px 12px; font-size: 12px; color: #cbd5e0; border-bottom: 1px solid #1e2533; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #1e2533; }
+  .td-metric  { font-weight: 600; color: #e2e8f0; }
+  .td-current { font-weight: 700; color: #f7fafc; }
+  .tag-up   { color: #68d391; font-weight: 700; font-size: 11px; }
+  .tag-down { color: #fc8181; font-weight: 700; font-size: 11px; }
+  .tag-flat { color: #718096; font-weight: 700; font-size: 11px; }
+  .th-roi-group { border-left: 2px solid #2d3748; }
+  .td-roi { border-left: 1px solid #1e2533; }
+  .roi-cell { display: flex; flex-direction: column; gap: 1px; }
+  .roi-cell-gross { font-size: 12px; font-weight: 700; }
+  .roi-cell-net   { font-size: 10px; font-weight: 600; }
+  .roi-cell-label { font-size: 9px; color: #4a5568; }
+
+  /* Status */
+  .status { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .status.green { background: #1a2e1a; color: #68d391; }
+  .status.amber { background: #1a1505; color: #f6ad55; }
+  .status.red   { background: #1a0f0f; color: #fc8181; }
+  .status.grey  { background: #1a202c; color: #4a5568; border: 1px solid #2d3748; }
+
+  /* Section B vertical sub-sections */
+  .vertical-section { margin-bottom: 18px; }
+  .vertical-section.hidden { display: none; }
+  .vertical-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 7px 12px; border-radius: 6px; }
+  .vertical-header.gaming   { background: #0f1a2e; border: 1px solid #1e3a5a; }
+  .vertical-header.surveys  { background: #1a1505; border: 1px solid #4a3a08; }
+  .vertical-header.receipts { background: #0f1a12; border: 1px solid #1e3a24; }
+  .vh-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .vh-title { font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+  .vh-sub   { font-size: 10px; color: #4a5568; margin-left: auto; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Funnel */
+  .funnel { padding: 14px; }
+  .funnel-step { display: flex; align-items: center; margin-bottom: 8px; }
+  .funnel-label   { width: 140px; font-size: 11px; color: #718096; flex-shrink: 0; }
+  .funnel-bar-wrap { flex: 1; height: 22px; background: #0f1117; border-radius: 4px; overflow: hidden; margin: 0 10px; }
+  .funnel-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 700; color: #f7fafc; }
+  .funnel-count { width: 50px; text-align: right; font-size: 12px; font-weight: 700; color: #e2e8f0; }
+  .funnel-pct   { width: 40px; text-align: right; font-size: 11px; color: #718096; }
+
+  .agg-badge { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+
+  /* Scorecard */
+  .scorecard { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px; }
+  .gate-card { background: #0f1117; border: 1px solid #2d3748; border-radius: 6px; padding: 12px; }
+  .gate-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .gate-num   { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #4a5568; }
+  .gate-title { font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 2px; }
+  .gate-timing { font-size: 10px; color: #4a5568; }
+  .gate-metric-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px; }
+  .gate-metric-label { color: #718096; }
+  .gate-metric-val   { font-weight: 700; }
+  .threshold-bar { height: 4px; background: #2d3748; border-radius: 2px; margin-top: 8px; }
+  .threshold-fill { height: 100%; border-radius: 2px; }
+  .threshold-markers { display: flex; justify-content: space-between; margin-top: 3px; font-size: 9px; color: #4a5568; }
+
+  /* Gate definition callout */
+  .gate-def { background: #12192a; border: 1px solid #2a3a5a; border-left: 3px solid #553c9a; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; }
+  .gate-def-icon { font-size: 18px; margin-top: 1px; }
+  .gate-def-body { font-size: 11px; color: #718096; line-height: 1.55; }
+  .gate-def-body strong { color: #a0aec0; }
+  .gate-def-body .gd-tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; margin: 0 2px; }
+  .gate-def-body .gd-tag.dd { background: #1a2e1a; color: #68d391; }
+  .gate-def-body .gd-tag.hold { background: #1a1505; color: #f6ad55; }
+  .gate-def-body .gd-tag.pivot { background: #1a0f0f; color: #fc8181; }
+
+  /* Cohort Heatmap */
+  .cohort-panel { background: #1a202c; border: 1px solid #2d3748; border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
+  .cohort-header { padding: 12px 16px; border-bottom: 1px solid #2d3748; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .cohort-title { font-size: 12px; font-weight: 700; color: #e2e8f0; }
+  .cohort-sub   { font-size: 10px; color: #4a5568; }
+  .cohort-legend { display: flex; gap: 8px; align-items: center; }
+  .cl-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #718096; }
+  .cl-swatch { width: 10px; height: 10px; border-radius: 2px; }
+  .cohort-table-wrap { overflow-x: auto; padding: 14px; }
+  .cohort-table { width: 100%; border-collapse: separate; border-spacing: 3px; }
+  .cohort-table th { padding: 6px 10px; font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: #4a5568; text-align: center; background: transparent; border-bottom: none; }
+  .cohort-table th.row-header { text-align: left; width: 90px; }
+  .cohort-table td { padding: 0; border: none; text-align: center; border-radius: 4px; }
+  .cohort-table tr:hover td { background: inherit; }
+  .cohort-cell { padding: 7px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; white-space: nowrap; min-width: 62px; display: block; }
+  .cohort-cell.empty { background: transparent; color: #2d3748; }
+  .cohort-cell.cohort-size { background: #1e2a3a; color: #718096; font-weight: 600; font-size: 11px; }
+  .cohort-row-label { padding: 7px 10px; font-size: 11px; font-weight: 600; color: #718096; text-align: left; }
+  .cohort-context { padding: 10px 14px; border-top: 1px solid #2d3748; }
+  .cohort-context-item { font-size: 11px; color: #718096; }
+  .cohort-context-item strong { color: #a0aec0; }
+
+  .filterable-row.hidden { display: none; }
+  .filterable-panel.hidden { display: none; }
+
+  .footer { margin-top: 20px; padding: 12px 16px; background: #1a202c; border: 1px solid #2d3748; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .footer-note { font-size: 11px; color: #4a5568; }
+  .footer-legend { display: flex; gap: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #718096; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+</style>
+</head>
+<body>
+<div class="dashboard">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <h1>BrandBee UK Growth Dashboard</h1>
+      <p>90-Day UK Launch - Last updated: 25 March 2026 | Illustrative sample data</p>
+    </div>
+    <div class="header-right">
+      <div class="week-badge">Week 6 of 13</div>
+      <div class="status-live"><span class="dot"></span> UA Active</div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <span class="filter-label">Vertical</span>
+      <div class="filter-pills">
+        <button class="pill active" data-filter="vertical" data-value="all">All</button>
+        <button class="pill" data-filter="vertical" data-value="gaming">Gaming</button>
+        <button class="pill" data-filter="vertical" data-value="receipts">Receipts</button>
+        <button class="pill" data-filter="vertical" data-value="surveys">Surveys</button>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-label">UA Source</span>
+      <div class="filter-pills">
+        <button class="pill active" data-filter="source" data-value="all">All Sources</button>
+        <button class="pill" data-filter="source" data-value="google">Google UAC</button>
+        <button class="pill" data-filter="source" data-value="applovin">AppLovin</button>
+        <button class="pill" data-filter="source" data-value="meta">Meta</button>
+        <button class="pill" data-filter="source" data-value="tiktok">TikTok</button>
+      </div>
+    </div>
+    <div class="filter-active-indicator hidden" id="filterIndicator">
+      <span id="filterIndicatorText">Filtered view</span>
+    </div>
+  </div>
+
+  <!-- Attribution Logic Note -->
+  <div class="attr-note">
+    <div class="attr-note-grid">
+      <div class="attr-col">
+        <div class="attr-col-title">How Vertical is Assigned (AppsFlyer)</div>
+        <div class="attr-col-body">
+          Every install is tagged at the <strong>campaign level</strong> by AppsFlyer first-touch - not just by the creative.
+          A user from a <span class="tag">Surveys</span> campaign is permanently tagged as a Survey user <strong>even if they later play games or scan receipts</strong>.
+          Vertical = <strong>acquisition intent</strong>. Cross-vertical activity post-install is tracked separately as a positive HQU signal.
+        </div>
+      </div>
+      <div class="attr-col">
+        <div class="attr-col-title">Broad Campaigns - Attribution Rule</div>
+        <div class="attr-col-body">
+          When a campaign uses general messaging with no specific vertical targeting, the user is tagged by their <strong>first meaningful in-app action</strong> post-onboarding:
+          Games first = <span class="tag">Gaming</span>, Surveys first = <span class="tag amber">Surveys</span>, receipt scan first = <span class="tag green">Receipts</span>.
+          No action within 48h = <span class="tag">Unattributed</span> - excluded from vertical cohorts, included in blended totals.
+        </div>
+      </div>
+      <div class="attr-col">
+        <div class="attr-col-title">MMM vs. AppsFlyer - Two Layers</div>
+        <div class="attr-col-body">
+          <strong>AppsFlyer (user-level):</strong> tags each install to channel + vertical. Powers this dashboard.<br><br>
+          <strong>MMM (channel-level):</strong> measures aggregate channel contribution to outcomes without individual user IDs. Used for <strong>budget allocation decisions only</strong> - does not change how individual users are tagged.
+          Complementary, not competing.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section A: App KPIs -->
+  <div class="section-label">Section A - BrandBee App KPIs <span id="kpi-filter-label" style="font-size:9px;color:#3182ce;font-weight:400;letter-spacing:0;text-transform:none;margin-left:8px;"></span></div>
+
+  <div class="kpi-row kpi-row-4">
+    <div class="kpi-card watch">
+      <div class="gate-tag">Gate 1</div>
+      <div class="kpi-label">Blended CPI</div>
+      <div class="kpi-value watch-text" id="kpi-cpi">$0.91</div>
+      <div class="kpi-sub"><span class="wow up">▼ -7% WoW</span><span class="vs-baseline">Target: &lt;$0.80</span></div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">Onboarding Completion</div>
+      <div class="kpi-value" id="kpi-onboarding">61%</div>
+      <div class="kpi-sub"><span class="wow up">▲ +7% WoW</span><span class="vs-baseline">-12% vs. US baseline</span></div>
+    </div>
+    <div class="kpi-card good">
+      <div class="gate-tag">Gate 2</div>
+      <div class="kpi-label">D7 Retention</div>
+      <div class="kpi-value good-text" id="kpi-d7ret">14%</div>
+      <div class="kpi-sub"><span class="wow up">▲ +17% WoW</span><span class="vs-baseline">Target: &gt;15% - At threshold</span></div>
+    </div>
+    <div class="kpi-card watch">
+      <div class="gate-tag">Gate 1</div>
+      <div class="kpi-label">D7 ROI - Gross vs. Net</div>
+      <div class="roi-split">
+        <div class="roi-side">
+          <div class="roi-side-label" style="color:#63b3ed;">Gross</div>
+          <div class="roi-side-val watch-text" id="kpi-gross-roas">21%</div>
+          <div class="roi-side-note">Partner rev / UA spend</div>
+        </div>
+        <div class="roi-side">
+          <div class="roi-side-label" style="color:#fc8181;">Net</div>
+          <div class="roi-side-val" style="color:#fc8181;" id="kpi-net-roas">13%</div>
+          <div class="roi-side-note">After rewards earned by users</div>
+        </div>
+      </div>
+      <div style="font-size:9px;color:#4a5568;margin-top:4px;padding-top:4px;border-top:1px solid #2d3748;">Net = (Partner Rev - Rewards Earned) / UA Spend. Rewards earned = all accrued balance, including unredeemed.</div>
+    </div>
+  </div>
+
+  <div class="kpi-row kpi-row-5">
+    <div class="kpi-card neutral">
+      <div class="kpi-label">D1 Retention</div>
+      <div class="kpi-value" id="kpi-d1ret">24%</div>
+      <div class="kpi-sub"><span class="wow up">▲ +14% WoW</span><span class="vs-baseline">-7% vs. US baseline</span></div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">D30 Retention</div>
+      <div class="kpi-value" style="font-size:18px;color:#4a5568;">Pending</div>
+      <div class="kpi-sub"><span class="wow flat">- -</span><span class="vs-baseline">Gate 2 - available D30</span></div>
+    </div>
+    <div class="kpi-card good">
+      <div class="kpi-label">First Withdrawal %</div>
+      <div class="kpi-value good-text" id="kpi-withdrawal">8%</div>
+      <div class="kpi-sub"><span class="wow up">▲ +33% WoW</span><span class="vs-baseline">T11 prompt activating</span></div>
+    </div>
+    <div class="kpi-card watch">
+      <div class="kpi-label">HQU %</div>
+      <div class="kpi-value watch-text" id="kpi-hqu">27%</div>
+      <div class="kpi-sub"><span class="wow up">▲ +17% WoW</span><span class="vs-baseline">Target: &gt;30% - Watch</span></div>
+    </div>
+    <!-- Cross-Vertical Engagement -->
+    <div class="kpi-card cross">
+      <div class="kpi-label">Cross-Vertical Engagement</div>
+      <div class="kpi-value cross-text" id="kpi-crossvert">18%</div>
+      <div class="kpi-sub"><span class="wow up">▲ +22% WoW</span><span class="vs-baseline">Target: &gt;25% by D30</span></div>
+      <div style="font-size:9px;color:#4a5568;margin-top:6px;padding-top:6px;border-top:1px solid #2d3748;">Users who engaged with 2+ verticals within 30 days of install. Highest HQU signal - these users have 2.4x higher LTV vs. single-vertical users.</div>
+    </div>
+  </div>
+
+  <!-- Section B: Partner KPIs -->
+  <div class="section-label">Section B - Partner KPIs by Vertical</div>
+
+  <!-- Gaming Vertical -->
+  <div class="vertical-section" id="vs-gaming">
+    <div class="vertical-header gaming">
+      <span class="vh-dot" style="background:#63b3ed;"></span>
+      <span class="vh-title" style="color:#63b3ed;">Gaming Vertical</span>
+      <span class="vh-sub">Aggregators + Top Games | AppLovin & Google UAC</span>
+    </div>
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Aggregator Performance</span>
+          <span class="panel-sub">Click-to-Game-Download Rate</span>
+        </div>
+        <table>
+          <thead><tr><th>Aggregator</th><th>Clicks</th><th>Downloads</th><th>DL Rate</th><th>WoW</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="td-metric"><span class="agg-badge" style="background:#68d391"></span>Tapjoy</td><td>520</td><td>218</td><td class="td-current">42%</td><td><span class="tag-up">▲ +3%</span></td><td><span class="status green">ON TRACK</span></td></tr>
+            <tr><td class="td-metric"><span class="agg-badge" style="background:#63b3ed"></span>RevU</td><td>680</td><td>258</td><td class="td-current">38%</td><td><span class="tag-up">▲ +5%</span></td><td><span class="status amber">WATCH</span></td></tr>
+            <tr><td class="td-metric"><span class="agg-badge" style="background:#718096"></span>AppSprize</td><td>180</td><td>60</td><td class="td-current">33%</td><td><span class="tag-flat">- 0%</span></td><td><span class="status amber">WATCH</span></td></tr>
+            <tr><td class="td-metric" style="color:#718096">LoyaltyPlay</td><td>150</td><td>42</td><td class="td-current" style="color:#fc8181">28%</td><td><span class="tag-down">▼ -4%</span></td><td><span class="status amber">WATCH</span></td></tr>
+            <tr><td class="td-metric"><span class="agg-badge" style="background:#fc8181"></span>Prime Earn</td><td>310</td><td>90</td><td class="td-current" style="color:#fc8181">29%</td><td><span class="tag-down">▼ -8%</span></td><td><span class="status red">REVIEW</span></td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px;border-top:1px solid #2d3748;font-size:10px;color:#4a5568;">Target: avg download rate &gt;40%. Prime Earn at 29% (-8% WoW) - review offer inventory for UK relevance.</div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Top Game Performance</span>
+          <span class="panel-sub">IAP % + Avg Session</span>
+        </div>
+        <table>
+          <thead><tr><th>Game</th><th>IAP %</th><th>Avg Session</th><th>D7 Ret.</th><th>WoW</th></tr></thead>
+          <tbody>
+            <tr><td class="td-metric">Coin Master</td><td class="td-current" style="color:#68d391">4.1%</td><td>22 min</td><td>18%</td><td><span class="tag-up">▲ +0.4%</span></td></tr>
+            <tr><td class="td-metric">Match Factory</td><td class="td-current">3.3%</td><td>31 min</td><td>16%</td><td><span class="tag-flat">- 0%</span></td></tr>
+            <tr><td class="td-metric">Merge Manor</td><td class="td-current">2.8%</td><td>18 min</td><td>14%</td><td><span class="tag-up">▲ +0.2%</span></td></tr>
+            <tr><td class="td-metric" style="color:#718096">Dream Games</td><td class="td-current" style="color:#fc8181">1.2%</td><td>14 min</td><td style="color:#fc8181">8%</td><td><span class="tag-down">▼ -0.3%</span></td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px;border-top:1px solid #2d3748;font-size:10px;color:#4a5568;">Expert benchmark (Christine, Prodege): 20-40% of users should make at least 1 IAP. Current: 5-10% per game - building toward target.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Surveys Vertical -->
+  <div class="vertical-section" id="vs-surveys">
+    <div class="vertical-header surveys">
+      <span class="vh-dot" style="background:#f6ad55;"></span>
+      <span class="vh-title" style="color:#f6ad55;">Surveys Vertical</span>
+      <span class="vh-sub">Funnel + Top Surveys | Google UAC & Meta</span>
+    </div>
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Survey Completion Funnel</span>
+          <span class="panel-sub">This week</span>
+        </div>
+        <div class="funnel">
+          <div class="funnel-step">
+            <div class="funnel-label">Surveys Section Opens</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#2b4a7c;">2,400</div></div>
+            <div class="funnel-count">2,400</div><div class="funnel-pct">100%</div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-label">Survey Started</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:55%;background:#2a5c8f;">1,320</div></div>
+            <div class="funnel-count">1,320</div><div class="funnel-pct" style="color:#f6ad55;">55%</div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-label">Completed</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:33%;background:#276227;">792</div></div>
+            <div class="funnel-count">792</div><div class="funnel-pct" style="color:#68d391;">60%</div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-label">Reward Credited</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:32%;background:#1e4a1e;">775</div></div>
+            <div class="funnel-count">775</div><div class="funnel-pct" style="color:#68d391;">98%</div>
+          </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid #2d3748;display:flex;justify-content:space-between;">
+            <span style="font-size:11px;color:#718096;">Overall Conversion (Opens → Reward)</span>
+            <span style="font-size:14px;font-weight:700;color:#68d391;">32% <span style="font-size:10px;color:#4a5568;">Target: &gt;35%</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Top Surveys This Week</span>
+          <span class="panel-sub">By completion rate</span>
+        </div>
+        <table>
+          <thead><tr><th>Survey / Category</th><th>Completions</th><th>Compl. Rate</th><th>Avg Time</th><th>Avg Reward</th><th>WoW</th></tr></thead>
+          <tbody>
+            <tr><td class="td-metric">FMCG Consumer Habits<br><span style="font-size:10px;color:#4a5568;">Retail</span></td><td>184</td><td class="td-current" style="color:#68d391;">74%</td><td>8 min</td><td style="color:#68d391;">£0.45</td><td><span class="tag-up">▲ +3%</span></td></tr>
+            <tr><td class="td-metric">Tech Usage UK 2026<br><span style="font-size:10px;color:#4a5568;">Technology</span></td><td>147</td><td class="td-current">68%</td><td>12 min</td><td style="color:#68d391;">£0.75</td><td><span class="tag-up">▲ +7%</span></td></tr>
+            <tr><td class="td-metric">Travel Planning 2026<br><span style="font-size:10px;color:#4a5568;">Travel</span></td><td>112</td><td class="td-current">66%</td><td>6 min</td><td>£0.35</td><td><span class="tag-up">▲ +5%</span></td></tr>
+            <tr><td class="td-metric">UK Political Views<br><span style="font-size:10px;color:#4a5568;">Politics</span></td><td>98</td><td class="td-current" style="color:#f6ad55;">51%</td><td>18 min</td><td style="color:#68d391;">£1.20</td><td><span class="tag-down">▼ -2%</span></td></tr>
+            <tr><td class="td-metric">Financial Wellbeing<br><span style="font-size:10px;color:#4a5568;">Finance</span></td><td>87</td><td class="td-current">63%</td><td>9 min</td><td>£0.50</td><td><span class="tag-flat">- 0%</span></td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px;border-top:1px solid #2d3748;font-size:10px;color:#4a5568;">UK Political Views: low completion (51%) due to length (18 min). Consider split into shorter segments or increase reward to £1.50+.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receipts Vertical -->
+  <div class="vertical-section" id="vs-receipts">
+    <div class="vertical-header receipts">
+      <span class="vh-dot" style="background:#68d391;"></span>
+      <span class="vh-title" style="color:#68d391;">Receipts Vertical</span>
+      <span class="vh-sub">Scan Funnel + Top Shops | Meta & Google UAC</span>
+    </div>
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Receipt Scan Funnel</span>
+          <span class="panel-sub">This week</span>
+        </div>
+        <div class="funnel">
+          <div class="funnel-step">
+            <div class="funnel-label">Receipts Section Opens</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#1e3a2a;">1,840</div></div>
+            <div class="funnel-count">1,840</div><div class="funnel-pct">100%</div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-label">Photo Taken</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:70%;background:#276227;">1,288</div></div>
+            <div class="funnel-count">1,288</div><div class="funnel-pct" style="color:#f6ad55;">70%</div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-label">Receipt Validated</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:53%;background:#1e5a2e;">966</div></div>
+            <div class="funnel-count">966</div><div class="funnel-pct" style="color:#68d391;">75%</div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-label">Reward Credited</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:48%;background:#1a4a24;">889</div></div>
+            <div class="funnel-count">889</div><div class="funnel-pct" style="color:#68d391;">92%</div>
+          </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid #2d3748;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:11px;color:#718096;">Overall Conversion (Opens → Reward)</span>
+              <span style="font-size:14px;font-weight:700;color:#f6ad55;">48% <span style="font-size:10px;color:#4a5568;">Target: &gt;55%</span></span>
+            </div>
+            <div style="font-size:10px;color:#4a5568;">Main drop-off: Opens → Photo Taken (30% abandon). W9 Tracking Active fix + onboarding tutorial expected to improve this step.</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Top Shops Scanned</span>
+          <span class="panel-sub">By receipt volume this week</span>
+        </div>
+        <table>
+          <thead><tr><th>Shop</th><th>Receipts</th><th>Validated %</th><th>Avg Reward</th><th>Avg Items</th><th>WoW</th></tr></thead>
+          <tbody>
+            <tr><td class="td-metric">Tesco</td><td class="td-current">312</td><td style="color:#68d391;">89%</td><td>£0.22</td><td>14</td><td><span class="tag-up">▲ +8%</span></td></tr>
+            <tr><td class="td-metric">Boots</td><td class="td-current">241</td><td style="color:#68d391;">91%</td><td>£0.31</td><td>5</td><td><span class="tag-up">▲ +12%</span></td></tr>
+            <tr><td class="td-metric">Sainsbury's</td><td class="td-current">189</td><td style="color:#68d391;">88%</td><td>£0.25</td><td>12</td><td><span class="tag-up">▲ +4%</span></td></tr>
+            <tr><td class="td-metric">Greggs</td><td class="td-current">143</td><td style="color:#68d391;">94%</td><td>£0.08</td><td>2</td><td><span class="tag-up">▲ +17%</span></td></tr>
+            <tr><td class="td-metric">Costa Coffee</td><td class="td-current">98</td><td>90%</td><td>£0.12</td><td>2</td><td><span class="tag-up">▲ +9%</span></td></tr>
+            <tr><td class="td-metric" style="color:#718096;">ASDA</td><td>72</td><td style="color:#f6ad55;">81%</td><td>£0.19</td><td>11</td><td><span class="tag-flat">- 0%</span></td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px;border-top:1px solid #2d3748;font-size:10px;color:#4a5568;">Greggs highest validated rate (94%) - simple receipts with few items. ASDA at 81% - investigate: likely OCR issues with ASDA receipt format. UK "meal deal" culture driving Boots + Greggs volume.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section C: 90-Day Gate Scorecard -->
+  <div class="section-label">Section C - 90-Day Gate Scorecard</div>
+
+  <!-- Gate Definition -->
+  <div class="gate-def">
+    <div class="gate-def-icon">🎯</div>
+    <div class="gate-def-body">
+      <strong>What is a Gate?</strong> A Gate is a pre-scheduled decision checkpoint in the 90-day launch plan. At each gate, performance is measured against mathematical thresholds agreed <em>before</em> the campaign launched - removing emotion from the decision.
+      Three outcomes are possible: <span class="gd-tag dd">DOUBLE DOWN</span> metrics above target, increase budget; <span class="gd-tag hold">HOLD</span> within acceptable range, continue; <span class="gd-tag pivot">PIVOT</span> below threshold, change strategy immediately.
+      Any gate in RED triggers an immediate protocol review - <strong>do not wait for the next scheduled gate date</strong>.
+      Gate 1 (D7) measures acquisition efficiency. Gate 2 (D30) measures retention. Gate 3 (D45) measures partner value. Gate 4 (D90) is the final go/no-go on UK market expansion.
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:14px;">
+    <div class="panel-header">
+      <span class="panel-title">Pivot vs. Double Down Decision Gates</span>
+      <span class="panel-sub">Any RED gate triggers protocol immediately - do not wait for weekly review</span>
+    </div>
+    <div class="scorecard">
+      <div class="gate-card">
+        <div class="gate-header">
+          <div><div class="gate-num">Gate 1 - D7</div><div class="gate-title">Acquisition Efficiency</div><div class="gate-timing">CPI + D7 Gross ROAS</div></div>
+          <span class="status amber">WATCH</span>
+        </div>
+        <div class="gate-metric-row"><span class="gate-metric-label">Current CPI</span><span class="gate-metric-val" style="color:#f6ad55;">$0.91</span></div>
+        <div class="gate-metric-row"><span class="gate-metric-label">D7 Gross ROAS</span><span class="gate-metric-val" style="color:#f6ad55;">21%</span></div>
+        <div class="gate-metric-row"><span class="gate-metric-label">D7 Net ROAS</span><span class="gate-metric-val" style="color:#fc8181;">13%</span></div>
+        <div class="gate-metric-row"><span class="gate-metric-label">Target</span><span class="gate-metric-val" style="color:#718096;">CPI &lt;$0.80 / Gross &gt;25%</span></div>
+        <div class="threshold-bar"><div class="threshold-fill" style="width:62%;background:linear-gradient(90deg,#276227 0%,#b7791f 60%,#c53030 100%);"></div></div>
+        <div class="threshold-markers"><span>Pivot (&gt;$1.20)</span><span style="color:#f6ad55;">NOW</span><span>Double Down</span></div>
+      </div>
+      <div class="gate-card">
+        <div class="gate-header">
+          <div><div class="gate-num">Gate 2 - D30</div><div class="gate-title">Core Retention</div><div class="gate-timing">D30 Retention vs. US Baseline</div></div>
+          <span class="status grey">PENDING</span>
+        </div>
+        <div class="gate-metric-row"><span class="gate-metric-label">Current D30</span><span class="gate-metric-val" style="color:#4a5568;">Not yet measurable</span></div>
+        <div class="gate-metric-row"><span class="gate-metric-label">D7 leading signal</span><span class="gate-metric-val" style="color:#68d391;">14% - at target</span></div>
+        <div class="gate-metric-row"><span class="gate-metric-label">Target</span><span class="gate-metric-val" style="color:#718096;">Within 10% of US D30</span></div>
+        <div style="margin-top:10px;font-size:10px;color:#4a5568;">Available at Day 30 - currently Day 14</div>
+      </div>
+      <div class="gate-card">
+        <div class="gate-header">
+          <div><div class="gate-num">Gate 3 - D45</div><div class="gate-title">Partner Value Generation</div><div class="gate-timing">Game Download Rate + IAP %</div></div>
+          <span class="status amber">WATCH</span>
+        </div>
+        <div class="gate-metric-row"><span class="gate-metric-label">Avg download rate</span><span class="gate-metric-val" style="color:#f6ad55;">34.1%</span></div>
+        <div class="gate-metric-row"><span class="gate-metric-label">Best performer (Tapjoy)</span><span class="gate-metric-val" style="color:#68d391;">42%</span></div>
+        <div class="gate-metric-row"><span class="gate-metric-label">Target</span><span class="gate-metric-val" style="color:#718096;">&gt;40% avg / &gt;50% double down</span></div>
+        <div style="margin-top:8px;font-size:10px;background:#1a0f0f;border:1px solid #c53030;border-radius:4px;padding:6px 8px;color:#fc8181;">Prime Earn at 29% (-8% WoW) - review offer inventory for UK relevance</div>
+      </div>
+      <div class="gate-card">
+        <div class="gate-header">
+          <div><div class="gate-num">Gate 4 - D90</div><div class="gate-title">The 90-Day Call</div><div class="gate-timing">Net LTV / CAC Ratio</div></div>
+          <span class="status grey">PENDING</span>
+        </div>
+        <div class="gate-metric-row"><span class="gate-metric-label">Current Net LTV/CAC</span><span class="gate-metric-val" style="color:#4a5568;">Not yet measurable</span></div>
+        <div class="gate-metric-row"><span class="gate-metric-label">Target</span><span class="gate-metric-val" style="color:#718096;">&gt;1.5x Net LTV/CAC</span></div>
+        <div class="gate-metric-row"><span class="gate-metric-label">Pivot action</span><span class="gate-metric-val" style="color:#fc8181;">&lt;1.0x: halt broad UA</span></div>
+        <div class="gate-metric-row"><span class="gate-metric-label">Double down action</span><span class="gate-metric-val" style="color:#68d391;">&gt;1.5x: Phase 2 budget</span></div>
+        <div style="margin-top:8px;font-size:10px;background:#12192a;border:1px solid #2a3a5a;border-radius:4px;padding:6px 8px;color:#718096;">Net LTV = cumulative partner revenue minus all rewards earned by cohort. Withdrawn and unredeemed both counted as cost.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Channel Performance -->
+  <div class="section-label">Channel Performance - This Week</div>
+  <div class="panel" style="margin-bottom:14px;" id="panel-channels">
+    <table>
+      <thead>
+        <tr>
+          <th>Channel</th><th>Vertical Tag</th><th>CPI ($)</th><th>D1 Ret.</th><th>D7 Ret.</th><th>HQU %</th>
+          <th class="th-roi-group" style="color:#63b3ed;">Gross D7 ROAS</th>
+          <th style="color:#fc8181;">Net D7 ROAS</th>
+          <th>WoW CPI</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="filterable-row" data-source="google" data-vertical="gaming surveys">
+          <td class="td-metric">Google UAC</td><td><span style="font-size:10px;color:#718096;">Games + Surveys</span></td>
+          <td class="td-current">$0.85</td><td>27%</td><td>16%</td><td>31%</td>
+          <td class="td-roi"><div class="roi-cell"><span class="roi-cell-gross" style="color:#68d391;">26%</span><span class="roi-cell-label">Partner rev / spend</span></div></td>
+          <td><div class="roi-cell"><span class="roi-cell-net" style="color:#f6ad55;">16%</span><span class="roi-cell-label">After rewards earned</span></div></td>
+          <td><span class="tag-up">▼ -3%</span></td><td><span class="status green">ON TRACK</span></td>
+        </tr>
+        <tr class="filterable-row" data-source="applovin" data-vertical="gaming">
+          <td class="td-metric">AppLovin</td><td><span style="font-size:10px;color:#718096;">Games</span></td>
+          <td class="td-current">$0.78</td><td>31%</td><td>19%</td><td>34%</td>
+          <td class="td-roi"><div class="roi-cell"><span class="roi-cell-gross" style="color:#68d391;">29%</span><span class="roi-cell-label">Partner rev / spend</span></div></td>
+          <td><div class="roi-cell"><span class="roi-cell-net" style="color:#68d391;">18%</span><span class="roi-cell-label">After rewards earned</span></div></td>
+          <td><span class="tag-up">▼ -9%</span></td><td><span class="status green">STRONG</span></td>
+        </tr>
+        <tr class="filterable-row" data-source="meta" data-vertical="receipts surveys">
+          <td class="td-metric">Meta Ads</td><td><span style="font-size:10px;color:#718096;">Receipts + Surveys</span></td>
+          <td class="td-current">$1.05</td><td>19%</td><td>11%</td><td>22%</td>
+          <td class="td-roi"><div class="roi-cell"><span class="roi-cell-gross" style="color:#f6ad55;">17%</span><span class="roi-cell-label">Partner rev / spend</span></div></td>
+          <td><div class="roi-cell"><span class="roi-cell-net" style="color:#fc8181;">10%</span><span class="roi-cell-label">After rewards earned</span></div></td>
+          <td><span class="tag-down">▲ +4%</span></td><td><span class="status amber">WATCH</span></td>
+        </tr>
+        <tr class="filterable-row" data-source="tiktok" data-vertical="gaming receipts surveys">
+          <td class="td-metric">TikTok</td><td><span style="font-size:10px;color:#718096;">Multi-vertical</span></td>
+          <td class="td-current">$0.97</td><td>16%</td><td>9%</td><td>19%</td>
+          <td class="td-roi"><div class="roi-cell"><span class="roi-cell-gross" style="color:#f6ad55;">14%</span><span class="roi-cell-label">Partner rev / spend</span></div></td>
+          <td><div class="roi-cell"><span class="roi-cell-net" style="color:#fc8181;">8%</span><span class="roi-cell-label">After rewards earned</span></div></td>
+          <td><span class="tag-flat">- 0%</span></td><td><span class="status amber">TESTING</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="no-channel-results" style="display:none;padding:16px;text-align:center;font-size:12px;color:#4a5568;">No channels match the current filter combination.</div>
+    <div style="padding:8px 12px;border-top:1px solid #2d3748;font-size:10px;color:#4a5568;display:flex;gap:20px;flex-wrap:wrap;">
+      <span><span style="color:#63b3ed;font-weight:700;">Gross ROAS</span> = Partner revenue / UA spend. What BrandBee collects before paying users.</span>
+      <span><span style="color:#fc8181;font-weight:700;">Net ROAS</span> = (Partner revenue - Rewards earned) / UA spend. Rewards earned includes unredeemed balance. This is the true margin metric.</span>
+    </div>
+  </div>
+
+  <!-- Section D: Cohort UA Activity -->
+  <div class="section-label">Section D - Cohort UA Activity</div>
+  <div class="cohort-panel">
+    <div class="cohort-header">
+      <div>
+        <div class="cohort-title">Weekly Install Cohort Retention Heatmap</div>
+        <div class="cohort-sub" id="cohort-subtitle">All Verticals / All Sources</div>
+      </div>
+      <div class="cohort-legend">
+        <div class="cl-item"><div class="cl-swatch" style="background:#1a3a5c"></div>Cohort size</div>
+        <div class="cl-item"><div class="cl-swatch" style="background:#1a3d28"></div>&gt;20%</div>
+        <div class="cl-item"><div class="cl-swatch" style="background:#2d4a10"></div>10-20%</div>
+        <div class="cl-item"><div class="cl-swatch" style="background:#4a3a08"></div>5-10%</div>
+        <div class="cl-item"><div class="cl-swatch" style="background:#4a1a10"></div>&lt;5%</div>
+      </div>
+    </div>
+    <div class="cohort-table-wrap">
+      <table class="cohort-table">
+        <thead>
+          <tr>
+            <th class="row-header">Cohort</th>
+            <th>Installs</th>
+            <th>Wk 1<br><span style="font-size:9px;font-weight:400;color:#4a5568;">D1-D7</span></th>
+            <th>Wk 2<br><span style="font-size:9px;font-weight:400;color:#4a5568;">D8-D14</span></th>
+            <th>Wk 3<br><span style="font-size:9px;font-weight:400;color:#4a5568;">D15-D21</span></th>
+            <th>Wk 4<br><span style="font-size:9px;font-weight:400;color:#4a5568;">D22-D28</span></th>
+            <th>Wk 5<br><span style="font-size:9px;font-weight:400;color:#4a5568;">D29-D35</span></th>
+            <th>Wk 6<br><span style="font-size:9px;font-weight:400;color:#4a5568;">D36-D42</span></th>
+          </tr>
+        </thead>
+        <tbody id="cohortBody"></tbody>
+      </table>
+    </div>
+    <div class="cohort-context" id="cohortContext"></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-note">All data illustrative - actual values populate once UK UA campaigns launch - reviewed weekly</div>
+    <div class="footer-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#68d391"></div>On Track / Double Down</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f6ad55"></div>Watch - Action Required</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fc8181"></div>Pivot Signal - Act Now</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#4a5568"></div>Pending</div>
+    </div>
+  </div>
+
+</div>
+<script>
+// ─── KPI data by vertical × source ────────────────────────────────────────────
+const kpiData = {
+  all: {
+    all:      { cpi:'$0.91', onboarding:'61%', d7ret:'14%', grossRoas:'21%', netRoas:'13%', d1ret:'24%', withdrawal:'8%',  hqu:'27%', crossvert:'18%' },
+    google:   { cpi:'$0.87', onboarding:'63%', d7ret:'16%', grossRoas:'24%', netRoas:'15%', d1ret:'27%', withdrawal:'7%',  hqu:'30%', crossvert:'19%' },
+    applovin: { cpi:'$0.79', onboarding:'66%', d7ret:'18%', grossRoas:'29%', netRoas:'18%', d1ret:'31%', withdrawal:'6%',  hqu:'34%', crossvert:'21%' },
+    meta:     { cpi:'$1.05', onboarding:'57%', d7ret:'11%', grossRoas:'14%', netRoas:'8%',  d1ret:'19%', withdrawal:'10%', hqu:'22%', crossvert:'15%' },
+    tiktok:   { cpi:'$1.12', onboarding:'54%', d7ret:'9%',  grossRoas:'11%', netRoas:'6%',  d1ret:'16%', withdrawal:'13%', hqu:'18%', crossvert:'12%' },
+  },
+  gaming: {
+    all:      { cpi:'$0.82', onboarding:'64%', d7ret:'16%', grossRoas:'26%', netRoas:'16%', d1ret:'27%', withdrawal:'6%',  hqu:'31%', crossvert:'22%' },
+    google:   { cpi:'$0.85', onboarding:'65%', d7ret:'18%', grossRoas:'28%', netRoas:'17%', d1ret:'28%', withdrawal:'5%',  hqu:'33%', crossvert:'23%' },
+    applovin: { cpi:'$0.74', onboarding:'68%', d7ret:'20%', grossRoas:'33%', netRoas:'21%', d1ret:'32%', withdrawal:'5%',  hqu:'37%', crossvert:'26%' },
+    meta:     { cpi:'$0.00', onboarding:'—',   d7ret:'—',   grossRoas:'—',   netRoas:'—',   d1ret:'—',   withdrawal:'—',  hqu:'—',   crossvert:'—'   },
+    tiktok:   { cpi:'$0.98', onboarding:'61%', d7ret:'11%', grossRoas:'17%', netRoas:'10%', d1ret:'19%', withdrawal:'8%',  hqu:'25%', crossvert:'17%' },
+  },
+  receipts: {
+    all:      { cpi:'$0.94', onboarding:'59%', d7ret:'12%', grossRoas:'18%', netRoas:'11%', d1ret:'22%', withdrawal:'11%', hqu:'24%', crossvert:'14%' },
+    google:   { cpi:'$0.91', onboarding:'61%', d7ret:'13%', grossRoas:'20%', netRoas:'12%', d1ret:'24%', withdrawal:'10%', hqu:'26%', crossvert:'15%' },
+    applovin: { cpi:'$0.86', onboarding:'63%', d7ret:'15%', grossRoas:'23%', netRoas:'14%', d1ret:'26%', withdrawal:'9%',  hqu:'28%', crossvert:'16%' },
+    meta:     { cpi:'$1.08', onboarding:'55%', d7ret:'10%', grossRoas:'13%', netRoas:'7%',  d1ret:'18%', withdrawal:'13%', hqu:'20%', crossvert:'12%' },
+    tiktok:   { cpi:'$1.18', onboarding:'52%', d7ret:'8%',  grossRoas:'10%', netRoas:'5%',  d1ret:'15%', withdrawal:'15%', hqu:'16%', crossvert:'10%' },
+  },
+  surveys: {
+    all:      { cpi:'$0.98', onboarding:'58%', d7ret:'10%', grossRoas:'16%', netRoas:'9%',  d1ret:'18%', withdrawal:'12%', hqu:'22%', crossvert:'11%' },
+    google:   { cpi:'$0.94', onboarding:'60%', d7ret:'12%', grossRoas:'18%', netRoas:'11%', d1ret:'20%', withdrawal:'11%', hqu:'24%', crossvert:'12%' },
+    applovin: { cpi:'$0.88', onboarding:'62%', d7ret:'14%', grossRoas:'21%', netRoas:'13%', d1ret:'22%', withdrawal:'10%', hqu:'26%', crossvert:'14%' },
+    meta:     { cpi:'$1.10', onboarding:'53%', d7ret:'9%',  grossRoas:'12%', netRoas:'6%',  d1ret:'16%', withdrawal:'14%', hqu:'19%', crossvert:'10%' },
+    tiktok:   { cpi:'$1.21', onboarding:'50%', d7ret:'7%',  grossRoas:'9%',  netRoas:'4%',  d1ret:'14%', withdrawal:'16%', hqu:'15%', crossvert:'8%'  },
+  },
+};
+function updateKPICards(v, s) {
+  s = s || 'all';
+  const vertData = kpiData[v] || kpiData.all;
+  const d = vertData[s] || vertData.all;
+  document.getElementById('kpi-cpi').textContent        = d.cpi;
+  document.getElementById('kpi-onboarding').textContent = d.onboarding;
+  document.getElementById('kpi-d7ret').textContent      = d.d7ret;
+  document.getElementById('kpi-gross-roas').textContent = d.grossRoas;
+  document.getElementById('kpi-net-roas').textContent   = d.netRoas;
+  document.getElementById('kpi-d1ret').textContent      = d.d1ret;
+  document.getElementById('kpi-withdrawal').textContent = d.withdrawal;
+  document.getElementById('kpi-hqu').textContent        = d.hqu;
+  document.getElementById('kpi-crossvert').textContent  = d.crossvert;
+  const vl = v === 'all' ? '' : v.charAt(0).toUpperCase()+v.slice(1)+' vertical';
+  const sb = document.querySelector(`.pill[data-value="${s}"][data-filter="source"]`);
+  const sl = s === 'all' ? 'all sources blended' : (sb ? sb.textContent : s);
+  const label = (v === 'all' && s === 'all') ? '' : '- ' + [vl, sl].filter(Boolean).join(', ');
+  document.getElementById('kpi-filter-label').textContent = label;
+}
+
+// ─── Cohort data ──────────────────────────────────────────────────────────────
+const cohortDatasets = {
+  all:{
+    all:{ label:'All Verticals / All Sources', rows:[
+      {period:'Wk 1 (Mar 2)', installs:812,  data:[24,14, 9, 6, 4, 3]},
+      {period:'Wk 2 (Mar 9)', installs:1104, data:[25,15,10, 7, 4,null]},
+      {period:'Wk 3 (Mar 16)',installs:1388, data:[23,14, 9, 6,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:1615, data:[24,13, 8,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:1820, data:[25,14,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:2012, data:[24,null,null,null,null,null]},
+    ], insight:'D1 retention stable at 24-25%. Wk 2 cohort D7 (15%) ahead of Wk 1 (14%) - positive trajectory. Users tagged by campaign vertical at install; cross-vertical activity tracked separately in HQU.'},
+    google:{ label:'All Verticals / Google UAC', rows:[
+      {period:'Wk 1 (Mar 2)', installs:244, data:[27,16,10, 7, 5, 3]},
+      {period:'Wk 2 (Mar 9)', installs:331, data:[28,17,11, 8, 5,null]},
+      {period:'Wk 3 (Mar 16)',installs:416, data:[26,15,10, 7,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:485, data:[27,16, 9,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:546, data:[28,16,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:604, data:[27,null,null,null,null,null]},
+    ], insight:'Google UAC above-average D1 (27%) and consistent D7 (15-17%). Value-based bidding switch at Week 8 once event volume exceeds 10/day.'},
+    applovin:{ label:'All Verticals / AppLovin', rows:[
+      {period:'Wk 1 (Mar 2)', installs:244, data:[31,18,12, 8, 5, 4]},
+      {period:'Wk 2 (Mar 9)', installs:331, data:[32,19,13, 9, 6,null]},
+      {period:'Wk 3 (Mar 16)',installs:416, data:[30,18,12, 8,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:485, data:[31,17,11,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:546, data:[32,18,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:604, data:[31,null,null,null,null,null]},
+    ], insight:'AppLovin best performer - D1 31%, D7 18-19%. Wk 2 cohort D28 at 9% confirms LTV trajectory supporting Phase 2 budget increase.'},
+    meta:{ label:'All Verticals / Meta', rows:[
+      {period:'Wk 1 (Mar 2)', installs:162, data:[19,11, 7, 4, 3, 2]},
+      {period:'Wk 2 (Mar 9)', installs:221, data:[20,11, 7, 5, 3,null]},
+      {period:'Wk 3 (Mar 16)',installs:278, data:[18,10, 6, 4,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:323, data:[19,10, 6,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:364, data:[20,11,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:402, data:[19,null,null,null,null,null]},
+    ], insight:'Meta lower D1 (19%) and D7 (10-11%). Higher CPI ($1.05) + lower retention = watch signal. "Cost of Living Hack" static creative refresh planned Week 7.'},
+    tiktok:{ label:'All Verticals / TikTok', rows:[
+      {period:'Wk 1 (Mar 2)', installs:162, data:[16, 9, 5, 3, 2,null]},
+      {period:'Wk 2 (Mar 9)', installs:221, data:[17, 9, 6, 4, 2,null]},
+      {period:'Wk 3 (Mar 16)',installs:278, data:[15, 8, 5, 3,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:323, data:[16, 9, 5,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:364, data:[17, 9,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:402, data:[16,null,null,null,null,null]},
+    ], insight:'TikTok testing phase. D7 at 9% - expected for discovery-intent traffic. "Cheeky Confession" UGC creative launching Week 7. Monitor D1 improvement before scaling.'},
+  },
+  gaming:{
+    all:{ label:'Gaming / All Sources', rows:[
+      {period:'Wk 1 (Mar 2)', installs:406,  data:[27,16,10, 7, 5, 3]},
+      {period:'Wk 2 (Mar 9)', installs:552,  data:[28,17,11, 8, 5,null]},
+      {period:'Wk 3 (Mar 16)',installs:694,  data:[26,16,10, 7,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:808,  data:[27,15, 9,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:910,  data:[28,16,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:1006, data:[27,null,null,null,null,null]},
+    ], insight:'Gaming leads retention. T4 fix (show game names not aggregator names) +4% onboarding vs. Week 1.'},
+    google:{ label:'Gaming / Google UAC', rows:[
+      {period:'Wk 1 (Mar 2)', installs:122, data:[28,17,11, 8, 5, 4]},
+      {period:'Wk 2 (Mar 9)', installs:166, data:[29,18,12, 8, 5,null]},
+      {period:'Wk 3 (Mar 16)',installs:208, data:[27,17,11, 7,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:242, data:[28,17,10,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:273, data:[29,18,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:302, data:[28,null,null,null,null,null]},
+    ], insight:'Gaming/Google strong CPI ($0.85) + D7 (18%). On track for D7 ROAS target 25%+ at Week 8.'},
+    applovin:{ label:'Gaming / AppLovin', rows:[
+      {period:'Wk 1 (Mar 2)', installs:244, data:[31,19,13, 9, 6, 4]},
+      {period:'Wk 2 (Mar 9)', installs:331, data:[33,20,14,10, 6,null]},
+      {period:'Wk 3 (Mar 16)',installs:416, data:[31,19,13, 9,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:485, data:[32,18,12,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:546, data:[33,19,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:604, data:[32,null,null,null,null,null]},
+    ], insight:'Best cohort. AppLovin/Gaming D7 19-20%. Wk 2 D28 at 10%. Phase 2 budget increase supported.'},
+    meta:{ label:'Gaming / Meta', rows:['Wk 1 (Mar 2)','Wk 2 (Mar 9)','Wk 3 (Mar 16)','Wk 4 (Mar 23)','Wk 5 (Mar 30)','Wk 6 (Apr 6)'].map(p=>({period:p,installs:0,data:[]})),
+      insight:'Meta not running Gaming campaigns. Budget allocated to Receipts + Surveys. See Gaming/AppLovin or Gaming/Google.'},
+    tiktok:{ label:'Gaming / TikTok', rows:[
+      {period:'Wk 1 (Mar 2)', installs:40,  data:[18,10, 6, 4, 2,null]},
+      {period:'Wk 2 (Mar 9)', installs:55,  data:[19,11, 7, 4, 2,null]},
+      {period:'Wk 3 (Mar 16)',installs:70,  data:[18,10, 6, 3,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:81,  data:[19,11, 6,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:91,  data:[20,11,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:101, data:[19,null,null,null,null,null]},
+    ], insight:'TikTok/Gaming small test. D1 trending up (18→20%). "Commute Earner" creative resonating. Scale pending D7 data on Wk 5.'},
+  },
+  receipts:{
+    all:{ label:'Receipts / All Sources', rows:[
+      {period:'Wk 1 (Mar 2)', installs:203, data:[22,12, 7, 5, 3, 2]},
+      {period:'Wk 2 (Mar 9)', installs:276, data:[23,13, 8, 5, 3,null]},
+      {period:'Wk 3 (Mar 16)',installs:347, data:[21,12, 7, 4,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:404, data:[22,11, 7,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:455, data:[23,12,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:503, data:[22,null,null,null,null,null]},
+    ], insight:'Receipts moderate retention. Physical scanning requires habit formation (2-3 weeks). Higher withdrawal % (11%) - transactional pattern. W9 Tracking Active fix critical.'},
+    google:{ label:'Receipts / Google UAC', rows:[
+      {period:'Wk 1 (Mar 2)', installs:61,  data:[23,13, 8, 5, 3, 2]},
+      {period:'Wk 2 (Mar 9)', installs:83,  data:[24,14, 9, 6, 3,null]},
+      {period:'Wk 3 (Mar 16)',installs:104, data:[22,13, 8, 5,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:121, data:[23,13, 8,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:137, data:[24,13,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:151, data:[23,null,null,null,null,null]},
+    ], insight:'Receipts/Google: search intent driving quality users. D7 13-14% strong for vertical.'},
+    meta:{ label:'Receipts / Meta', rows:[
+      {period:'Wk 1 (Mar 2)', installs:81,  data:[20,11, 7, 4, 3, 2]},
+      {period:'Wk 2 (Mar 9)', installs:110, data:[21,11, 7, 5, 3,null]},
+      {period:'Wk 3 (Mar 16)',installs:139, data:[19,10, 6, 4,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:162, data:[20,10, 6,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:182, data:[21,11,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:201, data:[20,null,null,null,null,null]},
+    ], insight:'Meta/Receipts: "Receipt Scanner" visual creative (Boots/Greggs) performing. D1 20-21%. Monitor Week 4+ retention drop.'},
+    tiktok:{ label:'Receipts / TikTok', rows:[
+      {period:'Wk 1 (Mar 2)', installs:61,  data:[17, 9, 5, 3, 2,null]},
+      {period:'Wk 2 (Mar 9)', installs:83,  data:[18, 9, 6, 3, 2,null]},
+      {period:'Wk 3 (Mar 16)',installs:104, data:[16, 8, 5, 3,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:121, data:[17, 8, 5,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:136, data:[18, 9,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:151, data:[17,null,null,null,null,null]},
+    ], insight:'TikTok/Receipts small test. D1 trending up. "Boots meal deal" hook resonating. Volume too small for statistical significance.'},
+    applovin:{ label:'Receipts / AppLovin', rows:['Wk 1 (Mar 2)','Wk 2 (Mar 9)','Wk 3 (Mar 16)','Wk 4 (Mar 23)','Wk 5 (Mar 30)','Wk 6 (Apr 6)'].map(p=>({period:p,installs:0,data:[]})),
+      insight:'AppLovin runs Gaming only. Not allocated to Receipts per channel strategy. See Receipts/Meta or Receipts/Google.'},
+  },
+  surveys:{
+    all:{ label:'Surveys / All Sources', rows:[
+      {period:'Wk 1 (Mar 2)', installs:203, data:[18,10, 6, 4, 2, 2]},
+      {period:'Wk 2 (Mar 9)', installs:276, data:[19,10, 6, 4, 2,null]},
+      {period:'Wk 3 (Mar 16)',installs:347, data:[17, 9, 5, 3,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:404, data:[18, 9, 5,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:455, data:[19,10,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:503, data:[18,null,null,null,null,null]},
+    ], insight:'Surveys lowest D7 (9-10%) - expected transactional pattern. Primary metric is first withdrawal % and repeat survey rate, not D7 retention alone.'},
+    google:{ label:'Surveys / Google UAC', rows:[
+      {period:'Wk 1 (Mar 2)', installs:61,  data:[20,12, 7, 5, 3, 2]},
+      {period:'Wk 2 (Mar 9)', installs:83,  data:[21,12, 8, 5, 3,null]},
+      {period:'Wk 3 (Mar 16)',installs:104, data:[19,11, 7, 4,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:121, data:[20,11, 7,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:137, data:[21,12,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:151, data:[20,null,null,null,null,null]},
+    ], insight:'Surveys/Google: search intent ("get paid surveys UK") produces above-average D7 (12%). CPI $0.85 efficient.'},
+    meta:{ label:'Surveys / Meta', rows:[
+      {period:'Wk 1 (Mar 2)', installs:81,  data:[17, 9, 5, 3, 2, 1]},
+      {period:'Wk 2 (Mar 9)', installs:110, data:[18, 9, 6, 4, 2,null]},
+      {period:'Wk 3 (Mar 16)',installs:139, data:[16, 8, 5, 3,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:162, data:[17, 9, 5,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:182, data:[18, 9,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:201, data:[17,null,null,null,null,null]},
+    ], insight:'Surveys/Meta: "Cost of Living Hack" static (Tesco). D7 9% consistent with norms. Survey completion 60% supports unit economics.'},
+    tiktok:{ label:'Surveys / TikTok', rows:[
+      {period:'Wk 1 (Mar 2)', installs:61,  data:[14, 7, 4, 2, 1,null]},
+      {period:'Wk 2 (Mar 9)', installs:83,  data:[15, 8, 4, 3, 1,null]},
+      {period:'Wk 3 (Mar 16)',installs:104, data:[13, 7, 4, 2,null,null]},
+      {period:'Wk 4 (Mar 23)',installs:121, data:[14, 7, 4,null,null,null]},
+      {period:'Wk 5 (Mar 30)',installs:137, data:[15, 8,null,null,null,null]},
+      {period:'Wk 6 (Apr 6)', installs:151, data:[14,null,null,null,null,null]},
+    ], insight:'TikTok/Surveys lowest retention (D7: 7-8%). TikTok 18-24 demographic misaligned with Surveys 25-44 target. Consider pausing Surveys on TikTok.'},
+    applovin:{ label:'Surveys / AppLovin', rows:['Wk 1 (Mar 2)','Wk 2 (Mar 9)','Wk 3 (Mar 16)','Wk 4 (Mar 23)','Wk 5 (Mar 30)','Wk 6 (Apr 6)'].map(p=>({period:p,installs:0,data:[]})),
+      insight:'AppLovin runs Gaming only. Not allocated to Surveys per channel strategy. See Surveys/Google or Surveys/Meta.'},
+  },
+};
+
+function getCellStyle(pct) {
+  if (pct >= 25) return {bg:'#1a3d28',text:'#68d391'};
+  if (pct >= 18) return {bg:'#1e3a20',text:'#48bb78'};
+  if (pct >= 12) return {bg:'#2d4a10',text:'#9ae62a'};
+  if (pct >= 8)  return {bg:'#4a3a08',text:'#f6ad55'};
+  if (pct >= 5)  return {bg:'#4a2a08',text:'#ed8936'};
+  return {bg:'#4a1a10',text:'#fc8181'};
+}
+
+function renderCohort(vertical, source) {
+  const ds = (cohortDatasets[vertical]||cohortDatasets.all)[source]||cohortDatasets.all.all;
+  document.getElementById('cohort-subtitle').textContent = ds.label + ' - Weeks since install vs. install cohort';
+  const isEmpty = ds.rows.every(r=>r.installs===0&&r.data.length===0);
+  let html = '';
+  if (isEmpty) {
+    html = `<tr><td colspan="8" style="padding:20px;text-align:center;font-size:12px;color:#4a5568;">${ds.insight}</td></tr>`;
+  } else {
+    const wkS=[0,0,0,0,0,0], wkC=[0,0,0,0,0,0];
+    ds.rows.forEach(r=>{
+      html+=`<tr><td><span class="cohort-row-label">${r.period}</span></td><td><span class="cohort-cell cohort-size">${r.installs.toLocaleString()}</span></td>`;
+      for(let w=0;w<6;w++){
+        const v=r.data[w];
+        if(v===undefined||v===null){html+=`<td><span class="cohort-cell empty">-</span></td>`;}
+        else{const s=getCellStyle(v);html+=`<td><span class="cohort-cell" style="background:${s.bg};color:${s.text};">${v}%</span></td>`;wkS[w]+=v;wkC[w]++;}
+      }
+      html+=`</tr>`;
+    });
+    const tot=ds.rows.reduce((s,r)=>s+r.installs,0);
+    html+=`<tr style="border-top:2px solid #2d3748;"><td><span class="cohort-row-label" style="color:#a0aec0;font-weight:700;">Avg</span></td><td><span class="cohort-cell cohort-size" style="color:#a0aec0;font-weight:700;">${tot.toLocaleString()}</span></td>`;
+    for(let w=0;w<6;w++){
+      if(!wkC[w]){html+=`<td><span class="cohort-cell empty">-</span></td>`;}
+      else{const avg=Math.round(wkS[w]/wkC[w]);const s=getCellStyle(avg);html+=`<td><span class="cohort-cell" style="background:${s.bg};color:${s.text};opacity:.75;">${avg}%</span></td>`;}
+    }
+    html+=`</tr>`;
+  }
+  document.getElementById('cohortBody').innerHTML=html;
+  document.getElementById('cohortContext').innerHTML=`<div class="cohort-context-item"><strong>Insight:</strong> ${ds.insight}</div>`;
+}
+
+// ─── Filter logic ─────────────────────────────────────────────────────────────
+let activeVertical='all', activeSource='all';
+
+function applyFilters() {
+  const v=activeVertical, s=activeSource;
+  const isFiltered=v!=='all'||s!=='all';
+  const ind=document.getElementById('filterIndicator');
+  ind.classList.toggle('hidden',!isFiltered);
+  if(isFiltered){
+    const vl=v==='all'?'':v.charAt(0).toUpperCase()+v.slice(1);
+    const sb=document.querySelector(`.pill[data-value="${s}"][data-filter="source"]`);
+    const sl=s==='all'?'':(sb?sb.textContent:s);
+    document.getElementById('filterIndicatorText').textContent=[vl,sl].filter(Boolean).join(' / ');
+  }
+  updateKPICards(v, s);
+
+  // Section B vertical sections
+  ['gaming','surveys','receipts'].forEach(vert=>{
+    document.getElementById('vs-'+vert).classList.toggle('hidden', v!=='all'&&v!==vert);
+  });
+
+  // Channel table
+  let vis=0;
+  document.querySelectorAll('#panel-channels .filterable-row').forEach(row=>{
+    const show=(s==='all'||row.dataset.source===s)&&(v==='all'||row.dataset.vertical.split(' ').includes(v));
+    row.classList.toggle('hidden',!show);
+    if(show)vis++;
+  });
+  document.getElementById('no-channel-results').style.display=vis===0?'block':'none';
+
+  renderCohort(v,s);
+}
+
+document.querySelectorAll('.pill').forEach(pill=>{
+  pill.addEventListener('click',()=>{
+    const f=pill.dataset.filter,val=pill.dataset.value;
+    document.querySelectorAll(`.pill[data-filter="${f}"]`).forEach(p=>p.classList.remove('active'));
+    pill.classList.add('active');
+    if(f==='vertical')activeVertical=val;
+    if(f==='source')activeSource=val;
+    applyFilters();
+  });
+});
+
+renderCohort('all','all');
+</script>
+<style>
+@media (max-width: 768px) {
+  .dashboard { padding: 12px; }
+  .header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .header-right { flex-wrap: wrap; gap: 8px; }
+  .filter-bar { gap: 12px; padding: 10px 12px; }
+  .filter-group { flex-wrap: wrap; }
+  .filter-pills { flex-wrap: wrap; }
+  .attr-note-grid { grid-template-columns: 1fr; }
+  .kpi-row-4 { grid-template-columns: repeat(2, 1fr); }
+  .kpi-row-5 { grid-template-columns: repeat(2, 1fr); }
+  .roi-split { grid-template-columns: 1fr; }
+  .two-col { grid-template-columns: 1fr; }
+  .scorecard { grid-template-columns: 1fr; }
+  .gate-def { grid-template-columns: 1fr; }
+  .cohort-table-wrap { overflow-x: auto; }
+  .section-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .tab-bar { overflow-x: auto; padding-bottom: 4px; }
+}
+</style>
+</body>
+</html>

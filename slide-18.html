@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 720pt; height: 405pt; overflow-y: auto; overflow-x: hidden; background: #0f1117; font-family: 'Pretendard', -apple-system, sans-serif; color: #f7fafc; }
+  .accordion-item { background: #1a202c; border: 1px solid #2d3748; border-radius: 7pt; overflow: hidden; margin-bottom: 5pt; }
+  .accordion-header { display: flex; align-items: center; gap: 8pt; padding: 7pt 10pt; cursor: pointer; user-select: none; }
+  .accordion-header:hover { background: #1f2937; }
+  .accordion-badge { width: 20pt; height: 20pt; border-radius: 50%; font-size: 10pt; font-weight: 800; color: #fff; text-align: center; line-height: 20pt; flex-shrink: 0; }
+  .accordion-title { flex: 1; font-size: 9pt; font-weight: 700; color: #f7fafc; }
+  .accordion-chevron { font-size: 10pt; color: #4a5568; transition: transform 0.2s; }
+  .accordion-body { display: none; padding: 0 10pt 8pt 38pt; }
+  .accordion-body.open { display: block; }
+  .accordion-chevron.open { transform: rotate(180deg); }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div style="display:flex; justify-content:space-between; align-items:center; padding:12pt 32pt 0 32pt;">
+  <p style="font-size:9pt; font-weight:700; color:#2563eb; letter-spacing:0.12em; text-transform:uppercase;">BrandBee UK · 90-Day Market Entry</p>
+  <p style="font-size:9pt; color:#6b7280;">18 / 23</p>
+</div>
+
+<!-- Title -->
+<div style="padding:8pt 32pt 8pt 32pt;">
+  <h1 style="font-size:18pt; font-weight:700; color:#f7fafc; letter-spacing:-0.01em;">Scenarios: How I Operate</h1>
+  <p style="font-size:9pt; color:#9ca3af; margin-top:2pt;">Five scenarios. Five structured responses. Diagnose before acting. Align before executing. Measure before claiming success.</p>
+</div>
+
+<!-- Accordion -->
+<div style="padding:0 32pt;" id="accordion">
+
+  <!-- Scenario A -->
+  <div class="accordion-item">
+    <div class="accordion-header" onclick="toggle('a')">
+      <p class="accordion-badge" style="background:#2563eb;">A</p>
+      <p class="accordion-title">Shifting Priorities and Leadership Changes</p>
+      <p class="accordion-chevron" id="chevron-a">&#9660;</p>
+    </div>
+    <div class="accordion-body" id="body-a">
+      <p style="font-size:8.5pt; color:#e2e8f0; line-height:1.55;">My first action in any leadership transition is 1:1s with every team member before any strategy session. I need to understand what was in flight, what was working, and what was quietly not working before I arrived. I consult with my new manager to align on what the team is expected to deliver and within what timeframe. I then share a direction that explicitly incorporates what I have learned from the team — not just what I think — so the team recognises their input in the plan. I halt any non-essential A/B tests immediately and focus the first 30 days on 2–3 revenue metrics the whole team can track. Clarity and stability in a transition period are more valuable than speed.</p>
+    </div>
+  </div>
+
+  <!-- Scenario B -->
+  <div class="accordion-item">
+    <div class="accordion-header" onclick="toggle('b')">
+      <p class="accordion-badge" style="background:#0d9488;">B</p>
+      <p class="accordion-title">A Strong Performer Who Is Difficult to Collaborate With</p>
+      <p class="accordion-chevron" id="chevron-b">&#9660;</p>
+    </div>
+    <div class="accordion-body" id="body-b">
+      <p style="font-size:8.5pt; color:#e2e8f0; line-height:1.55;">I lead with their results, not the behaviour. In a private 1:1, I acknowledge what they have built and then ask directly how they feel the collaboration is going — both with peers and cross-functional teams. Most people who are difficult to collaborate with are not aware of the full impact. I offer concrete tools: structured communication frameworks, joint decision threads, and a shared workspace for in-progress work. If the behaviour continues after two structured conversations with clear expectations set, I explore whether an individual contributor track is a better fit — some people produce exceptional work but are not suited to team dynamics. I would not let this affect the team's output while the situation is being addressed.</p>
+    </div>
+  </div>
+
+  <!-- Scenario C -->
+  <div class="accordion-item">
+    <div class="accordion-header" onclick="toggle('c')">
+      <p class="accordion-badge" style="background:#7c3aed;">C</p>
+      <p class="accordion-title">Growth Has Plateaued and the Team Feels Stuck</p>
+      <p class="accordion-chevron" id="chevron-c">&#9660;</p>
+    </div>
+    <div class="accordion-body" id="body-c">
+      <p style="font-size:8.5pt; color:#e2e8f0; line-height:1.55;">I run a structured internal challenge: 48 hours, every team member proposes one format, one channel, or one audience segment we have not yet tested. I use AI research tools — competitor teardowns, social listening, app review mining — to surface signals the team may have missed. I also do my own personal audit: what assumptions have we been operating on for the longest without questioning? The unlock for a plateau is almost always a format, channel, or audience not yet tested — not more budget into the same channels. Once the team generates ideas, I pick the one with the highest expected value and lowest execution cost, and we test it within two weeks. Fast iteration on the edge of the current strategy breaks plateaus.</p>
+    </div>
+  </div>
+
+  <!-- Scenario D -->
+  <div class="accordion-item">
+    <div class="accordion-header" onclick="toggle('d')">
+      <p class="accordion-badge" style="background:#d97706;">D</p>
+      <p class="accordion-title">Cross-Functional Priorities Conflict</p>
+      <p class="accordion-chevron" id="chevron-d">&#9660;</p>
+    </div>
+    <div class="accordion-body" id="body-d">
+      <p style="font-size:8.5pt; color:#e2e8f0; line-height:1.55;">My first step is to understand the other team's priorities before advocating for mine. In most priority conflicts, both teams are rational — they just have different success metrics. I build a business impact comparison: here is the revenue impact of my request, here is what I understand the impact of your request to be. I propose an urgency tagging system: Blocker (resolves within 24 hours), 3-Day (business impact materialising within 72 hours), Low (important but not time-sensitive). I frame all asks as joint efforts: "What would it take to move this forward together?" — not "Why is this blocked?" I escalate only if the business impact is demonstrably significant and the conversation has stalled.</p>
+    </div>
+  </div>
+
+  <!-- Scenario E -->
+  <div class="accordion-item">
+    <div class="accordion-header" onclick="toggle('e')">
+      <p class="accordion-badge" style="background:#059669;">E</p>
+      <p class="accordion-title">A Team Member Not Hitting ROI Targets</p>
+      <p class="accordion-chevron" id="chevron-e">&#9660;</p>
+    </div>
+    <div class="accordion-body" id="body-e">
+      <p style="font-size:8.5pt; color:#e2e8f0; line-height:1.55;">A UA manager on our Casino app was consistently missing ROAS targets across Google UAC campaigns. Before any conversation, I ran a full account audit: campaign structure, bid strategy, creative performance, and campaign age distribution. I identified a specific root cause: learning phase timing. New campaigns were being assessed and paused before Google's algorithm had accumulated sufficient conversion signal. The manager was optimising too early, killing campaigns before they could learn. I ran twice-weekly review sessions for four weeks, showing the data at each step — not delivering instructions. Target: +15% ROAS improvement. Outcome: <strong style="color:#68d391;">+20% improvement in 4 weeks.</strong> That manager is now our strongest Google UAC operator.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggle(id) {
+  var body = document.getElementById('body-' + id);
+  var chev = document.getElementById('chevron-' + id);
+  var isOpen = body.classList.contains('open');
+  ['a','b','c','d','e'].forEach(function(x) {
+    document.getElementById('body-' + x).classList.remove('open');
+    document.getElementById('chevron-' + x).classList.remove('open');
+  });
+  if (!isOpen) {
+    body.classList.add('open');
+    chev.classList.add('open');
+  }
+}
+</script>
+
+</body>
+</html>

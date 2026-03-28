@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 720pt; height: 405pt; overflow: hidden; background: #0f1117; font-family: 'Pretendard', -apple-system, sans-serif; color: #f7fafc; }
+  .gate { border-radius: 0 0 6pt 6pt; padding: 5pt 10pt; }
+  .gate-badge { width: 18pt; height: 18pt; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .gate-badge p { font-size: 9pt; font-weight: 800; color: #fff; }
+  .indicator { border-radius: 3pt; padding: 2pt 7pt; margin-top: 3pt; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div style="display:flex; justify-content:space-between; align-items:center; padding:10pt 32pt 0 32pt;">
+  <p style="font-size:9pt; font-weight:700; color:#2563eb; letter-spacing:0.12em; text-transform:uppercase;">BrandBee UK · 90-Day Market Entry</p>
+  <p style="font-size:9pt; color:#6b7280;">09 / 23</p>
+</div>
+
+<!-- Title -->
+<div style="padding:5pt 32pt 7pt 32pt;">
+  <h1 style="font-size:18pt; font-weight:700; color:#f7fafc; letter-spacing:-0.01em;">The 4 Decision Gates</h1>
+  <p style="font-size:9pt; color:#9ca3af; margin-top:2pt;">The decision to scale or pivot is not a judgement call on Day 90. It is a mathematical outcome of four pre-agreed thresholds.</p>
+</div>
+
+<!-- Gate Cards - 2x2 grid -->
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:5pt; padding:0 32pt;">
+
+  <!-- Gate 1 -->
+  <div class="gate" style="background:#12192a; border:1px solid #1e3a5f; border-top:2.5pt solid #2563eb;">
+    <div style="display:flex; align-items:center; gap:7pt; margin-bottom:4pt;">
+      <div class="gate-badge" style="background:#2563eb;"><p>1</p></div>
+      <div>
+        <p style="font-size:7pt; color:#4a7ab5; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;">Gate 1 · Day 7</p>
+        <p style="font-size:9.5pt; font-weight:700; color:#2563eb; line-height:1.1;">Acquisition Efficiency</p>
+      </div>
+    </div>
+    <p style="font-size:7pt; color:#6b7280; margin-bottom:4pt;">Metric: Blended CPI across all channels</p>
+    <div class="indicator" style="background:#0a1f0a; border:1px solid #276227;">
+      <p style="font-size:7pt; color:#68d391;">↑ CPI &lt;$0.80 + D7 ROAS &gt;25% → +30% budget</p>
+    </div>
+    <div class="indicator" style="background:#1a0a0a; border:1px solid #7f1d1d;">
+      <p style="font-size:7pt; color:#fca5a5;">↓ CPI &gt;$1.20 + ROAS &lt;15% → pause UA</p>
+    </div>
+  </div>
+
+  <!-- Gate 2 -->
+  <div class="gate" style="background:#0d1f1e; border:1px solid #0d4a46; border-top:2.5pt solid #0d9488;">
+    <div style="display:flex; align-items:center; gap:7pt; margin-bottom:4pt;">
+      <div class="gate-badge" style="background:#0d9488;"><p>2</p></div>
+      <div>
+        <p style="font-size:7pt; color:#0d7a74; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;">Gate 2 · Day 30</p>
+        <p style="font-size:9.5pt; font-weight:700; color:#0d9488; line-height:1.1;">Core Retention</p>
+      </div>
+    </div>
+    <p style="font-size:7pt; color:#6b7280; margin-bottom:4pt;">Metric: D30 Retention vs. US Baseline</p>
+    <div class="indicator" style="background:#0a1f0a; border:1px solid #276227;">
+      <p style="font-size:7pt; color:#68d391;">↑ UK D30 ≥ US baseline → unlock Meta + AppLovin</p>
+    </div>
+    <div class="indicator" style="background:#1a0a0a; border:1px solid #7f1d1d;">
+      <p style="font-size:7pt; color:#fca5a5;">↓ &gt;30% below US → pause UA, fix product</p>
+    </div>
+  </div>
+
+  <!-- Gate 3 -->
+  <div class="gate" style="background:#0a1a0f; border:1px solid #14532d; border-top:2.5pt solid #059669;">
+    <div style="display:flex; align-items:center; gap:7pt; margin-bottom:4pt;">
+      <div class="gate-badge" style="background:#059669;"><p>3</p></div>
+      <div>
+        <p style="font-size:7pt; color:#057a55; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;">Gate 3 · Day 45</p>
+        <p style="font-size:9.5pt; font-weight:700; color:#059669; line-height:1.1;">Partner Value</p>
+      </div>
+    </div>
+    <p style="font-size:7pt; color:#6b7280; margin-bottom:4pt;">Metric: Game Download Rate from aggregator clicks</p>
+    <div class="indicator" style="background:#0a1f0a; border:1px solid #276227;">
+      <p style="font-size:7pt; color:#68d391;">↑ &gt;50% download + IAP matches US → direct deals</p>
+    </div>
+    <div class="indicator" style="background:#1a0a0a; border:1px solid #7f1d1d;">
+      <p style="font-size:7pt; color:#fca5a5;">↓ &lt;15% download → trust gap diagnosed</p>
+    </div>
+  </div>
+
+  <!-- Gate 4 -->
+  <div class="gate" style="background:#1a1505; border:1px solid #4a3500; border-top:2.5pt solid #d97706;">
+    <div style="display:flex; align-items:center; gap:7pt; margin-bottom:4pt;">
+      <div class="gate-badge" style="background:#d97706;"><p>4</p></div>
+      <div>
+        <p style="font-size:7pt; color:#a35a05; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;">Gate 4 · Day 90</p>
+        <p style="font-size:9.5pt; font-weight:700; color:#d97706; line-height:1.1;">The Call</p>
+      </div>
+    </div>
+    <p style="font-size:7pt; color:#6b7280; margin-bottom:4pt;">Metric: Net LTV/CAC — Partner Revenue — Rewards / UA Spend</p>
+    <div class="indicator" style="background:#0a1f0a; border:1px solid #276227;">
+      <p style="font-size:7pt; color:#68d391;">↑ &gt;1.5× → DOUBLE DOWN — unlock Phase 2 budget</p>
+    </div>
+    <div class="indicator" style="background:#1a0a0a; border:1px solid #7f1d1d;">
+      <p style="font-size:7pt; color:#fca5a5;">↓ &lt;1.0× → PIVOT — teardown report within 2 weeks</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom: Note + Evaluation Layers -->
+<div style="padding:5pt 32pt 0 32pt; display:flex; gap:10pt; align-items:flex-start;">
+  <div style="flex:0 0 38%; background:#1a1505; border:1px solid #92400e; border-left:2.5pt solid #d97706; border-radius:0 4pt 4pt 0; padding:5pt 9pt;">
+    <p style="font-size:7.5pt; color:#e2e8f0; line-height:1.45;"><strong style="color:#d97706;">Important:</strong> Gate 4 uses NET ROI = (Partner Revenue - Rewards Earned) / UA Spend. Gross ROI can look healthy while rewards liability accumulates. Net is the true economic health indicator.</p>
+  </div>
+  <div style="flex:1;">
+    <p style="font-size:6.5pt; font-weight:700; color:#9ca3af; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:3pt;">Three Evaluation Layers - Examples Per Vertical</p>
+    <table style="border-collapse:collapse; width:100%;">
+      <thead>
+        <tr>
+          <th style="padding:2.5pt 5pt; background:#1a202c; border-bottom:1px solid #2d3748; color:#9ca3af; text-align:left; font-size:6.5pt; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">Layer</th>
+          <th style="padding:2.5pt 5pt; background:#1a202c; border-bottom:1px solid #2d3748; color:#63b3ed; text-align:left; font-size:6.5pt; font-weight:700;">Games</th>
+          <th style="padding:2.5pt 5pt; background:#1a202c; border-bottom:1px solid #2d3748; color:#68d391; text-align:left; font-size:6.5pt; font-weight:700;">Receipts</th>
+          <th style="padding:2.5pt 5pt; background:#1a202c; border-bottom:1px solid #2d3748; color:#f6ad55; text-align:left; font-size:6.5pt; font-weight:700;">Surveys</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:2.5pt 5pt; border-bottom:1px solid #1a202c; font-size:6.5pt; color:#e2e8f0;">BrandBee App</td>
+          <td style="padding:2.5pt 5pt; border-bottom:1px solid #1a202c; font-size:6.5pt; color:#63b3ed;">D7 retention after first game install</td>
+          <td style="padding:2.5pt 5pt; border-bottom:1px solid #1a202c; font-size:6.5pt; color:#68d391;">D7 retention after first receipt scan</td>
+          <td style="padding:2.5pt 5pt; border-bottom:1px solid #1a202c; font-size:6.5pt; color:#f6ad55;">D7 retention after first survey completion</td>
+        </tr>
+        <tr>
+          <td style="padding:2.5pt 5pt; border-bottom:1px solid #1a202c; font-size:6.5pt; color:#e2e8f0;">Partner/Aggregator</td>
+          <td style="padding:2.5pt 5pt; border-bottom:1px solid #1a202c; font-size:6.5pt; color:#63b3ed;">Game download rate from aggregator click</td>
+          <td style="padding:2.5pt 5pt; border-bottom:1px solid #1a202c; font-size:6.5pt; color:#68d391;">Receipt validity rate (legible, approved retailer)</td>
+          <td style="padding:2.5pt 5pt; border-bottom:1px solid #1a202c; font-size:6.5pt; color:#f6ad55;">Survey start rate from offer page visit</td>
+        </tr>
+        <tr>
+          <td style="padding:2.5pt 5pt; font-size:6.5pt; color:#e2e8f0;">Task Completion</td>
+          <td style="padding:2.5pt 5pt; font-size:6.5pt; color:#63b3ed;">In-game IAP% · levels reached · time-at-level</td>
+          <td style="padding:2.5pt 5pt; font-size:6.5pt; color:#68d391;">Scan frequency per week · store variety</td>
+          <td style="padding:2.5pt 5pt; font-size:6.5pt; color:#f6ad55;">Survey completion rate · attention check pass rate</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 720pt; height: 405pt; overflow: hidden; background: #0f1117; font-family: 'Pretendard', -apple-system, sans-serif; color: #f7fafc; }
+
+  details { border-radius: 0 7pt 7pt 0; margin-bottom: 6pt; overflow: hidden; }
+  details summary { display: flex; align-items: center; gap: 10pt; padding: 9pt 12pt; cursor: pointer; list-style: none; border-left: 3pt solid transparent; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after { content: '▼'; font-size: 9pt; color: #4a5568; margin-left: auto; transition: transform 0.2s; flex-shrink: 0; }
+  details[open] summary::after { transform: rotate(180deg); }
+  .q-body { padding: 0 12pt 10pt 12pt; }
+  .q-body p { font-size: 8pt; color: #e2e8f0; line-height: 1.5; margin-bottom: 5pt; }
+  .q-body p:last-child { margin-bottom: 0; }
+  .q-label { font-size: 7.5pt; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; flex-shrink: 0; width: 22pt; }
+  .q-title { font-size: 9.5pt; font-weight: 700; color: #f7fafc; }
+
+  /* Q1 - amber */
+  #q1 { background: #1a1505; border: 1px solid #92400e; border-left: 3pt solid #d97706; }
+  #q1 summary { border-left-color: #d97706; }
+  #q1 .q-label { color: #d97706; }
+  #q1[open] { border-color: #d97706; }
+  #q1 .q-body { border-top: 1px solid #92400e; }
+
+  /* Q2 - blue */
+  #q2 { background: #12192a; border: 1px solid #2a3a5a; border-left: 3pt solid #2563eb; }
+  #q2 summary { border-left-color: #2563eb; }
+  #q2 .q-label { color: #2563eb; }
+  #q2[open] { border-color: #2563eb; }
+  #q2 .q-body { border-top: 1px solid #2a3a5a; }
+
+  /* Q3 - teal */
+  #q3 { background: #0d1f1e; border: 1px solid #0d4a46; border-left: 3pt solid #0d9488; }
+  #q3 summary { border-left-color: #0d9488; }
+  #q3 .q-label { color: #0d9488; }
+  #q3[open] { border-color: #0d9488; }
+  #q3 .q-body { border-top: 1px solid #0d4a46; }
+
+  .pullquote { font-size: 8.5pt; font-style: italic; color: #f7fafc; font-weight: 600; margin-bottom: 5pt; line-height: 1.45; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div style="display:flex; justify-content:space-between; align-items:center; padding:12pt 32pt 0 32pt;">
+  <p style="font-size:9pt; font-weight:700; color:#2563eb; letter-spacing:0.12em; text-transform:uppercase;">BrandBee UK · 90-Day Market Entry</p>
+  <p style="font-size:9pt; color:#6b7280;">22 / 23</p>
+</div>
+
+<!-- Title -->
+<div style="padding:8pt 32pt 8pt 32pt;">
+  <h1 style="font-size:18pt; font-weight:700; color:#f7fafc; letter-spacing:-0.01em;">Final Thought Exercises</h1>
+  <p style="font-size:9pt; color:#9ca3af; margin-top:2pt;">The right questions reveal operating principles. Click each to expand the full answer.</p>
+</div>
+
+<!-- Q&A Accordion -->
+<div style="padding:0 32pt;">
+
+  <details id="q1">
+    <summary>
+      <span class="q-label">Q1</span>
+      <span class="q-title">Strategic Disagreement with Leadership</span>
+    </summary>
+    <div class="q-body">
+      <p>My first step is always to seek genuine understanding. Leadership often has context that is not visible from my vantage point: board commitments, runway constraints, regulatory requirements, partnership obligations. If I go into the conversation assuming I am right and they are wrong, I will have already lost the most important part of the exchange - the ability to learn something that might change my view.</p>
+      <p>If, after understanding the full context, I still disagree, I prepare a structured counter-proposal. Not a complaint - a proposal. I quantify the expected business impact of both directions: "Under the current plan, my model projects X outcome. Under the alternative approach, I project Y outcome. The difference is Z." I present this in writing, with supporting data, and request a specific decision meeting - not a hallway conversation.</p>
+      <p>If leadership reviews both positions and proceeds with their original plan, I commit fully to executing it. I will not hedge, slow-roll, or run the experiment I preferred in parallel without authorization. Fractional commitment to a direction is the fastest way to guarantee it fails, which helps no one.</p>
+      <p>What I do insist on, before execution begins, is establishing clear pre-agreed KPIs with milestones: "We'll know by Day 30 whether this is working based on these specific numbers." This protects both parties. If the decision turns out to be correct, it gets credit. If it turns out to be wrong, the measurement framework lets us course-correct quickly rather than after six months of sunk cost.</p>
+    </div>
+  </details>
+
+  <details id="q2">
+    <summary>
+      <span class="q-label">Q2</span>
+      <span class="q-title">The 70% Budget Cut</span>
+    </summary>
+    <div class="q-body">
+      <p>My first action is to immediately stop all experimental and exploratory channels. TikTok Spark Ads and the broad Meta campaigns are suspended first - they have the highest uncertainty and the longest payback cycles. I retain Google UAC for the Gaming vertical only: it is the highest-intent channel, the most measurable in near-real-time, and the one with the clearest direct path from install to partner revenue.</p>
+      <p>I stop all non-essential A/B tests. With a 70% budget cut, I cannot afford to learn slowly. I focus 100% of the reduced budget on the single vertical and creative direction that has the highest probability of hitting the D7 ROAS threshold.</p>
+      <p>I lean hard into organic growth levers that are free: ASO optimization (title, screenshots, description, keyword targeting) has high ROI and zero marginal cost. If we can improve Play Store conversion rate by 20%, that is effectively free installs that stretch the remaining budget further.</p>
+      <p>I introduce faster campaign pausing criteria. With limited runway, every underperforming campaign must be paused within 72 hours, not 7 days. The optimization cadence doubles in frequency. Data is reviewed daily, not weekly.</p>
+      <p>Finally, I communicate the budget change transparently to the team with a revised success framework. A 70% budget cut changes what "success" looks like for this launch. I align with leadership on adjusted targets immediately so the team is not measured against a plan that no longer reflects reality.</p>
+    </div>
+  </details>
+
+  <details id="q3">
+    <summary>
+      <span class="q-label">Q3</span>
+      <span class="q-title">The One Question Before Taking This Role</span>
+    </summary>
+    <div class="q-body">
+      <p class="pullquote">"How exactly do you define and measure success for this specific activity - and what are the mathematical targets we must hit before we consider the launch a win?"</p>
+      <p>The reason this is the single most important question is that without pre-agreed, measurable, specific targets established before the activity begins, "success" becomes whatever leadership remembers it was supposed to be after the fact. This is the single most common source of misaligned expectations between Growth teams and executive leadership - and it produces genuinely good work being judged as failure, or genuinely poor work being called a success because the measurement criteria were vague.</p>
+      <p>Getting alignment on mathematical targets before Day 1 protects the team, protects the strategy, and creates the conditions for an honest 90-day evaluation. If the targets are met, the case for Phase 2 investment is self-evident. If they are not met, the conversation is about the numbers - not about opinions.</p>
+    </div>
+  </details>
+
+</div>
+
+</body>
+</html>
